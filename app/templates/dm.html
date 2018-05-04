@@ -19,8 +19,7 @@
                     $('#dm').scrollTop($('#dm')[0].scrollHeight);
                 });
                 socket.on('sound', function(data) {
-									  var sound = new Audio(path);
-										console.log(path)
+									  var sound = new Audio(data.sound);
 										sound.play();
                 });
                 $('#text').keypress(function(e) {
@@ -31,13 +30,9 @@
                         socket.emit('text', {msg: text});
                     }
                 });
-                $('#path').keypress(function(e) {
-                    var code = e.keyCode || e.which;
-                    if (code == 13) {
-                        path = $('#path').val();
-                        $('#path').val('');
-                        socket.emit('sound', {sound: path});
-                    }
+								$('#clap').submit(function(e) {
+									socket.emit('sound', {sound: '/static/crowd.mp3'});
+									return false;
                 });
             });
             function leave_room() {
@@ -54,7 +49,9 @@
         <h1>DM Online: {{ room }}</h1>
         <textarea id="dm" cols="80" rows="20"></textarea><br><br>
         <input id="text" size="80" placeholder="Enter your message here"><br><br>
-				<input id="path" size="80" placeholder="Enter the name of the audio clip here"><br><br>
+				<form id="clap">
+				<input type="submit" value="Clapping Crowd"><br><br>
+				</form>
         <a href="#" onclick="leave_room();">Leave this room</a>
     </body>
 </html>
