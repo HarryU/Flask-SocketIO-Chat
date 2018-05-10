@@ -6,7 +6,7 @@
 		<script type="text/javascript" charset="utf-8">
 			var socket;
 			$(document).ready(function(){
-				socket = io.connect('http://' + document.domain + ':' + location.port + '/dm');
+				socket = io.connect('//' + document.domain + ':' + location.port + '/dm');
 				socket.on('connect', function() {
 					socket.emit('joined', {});
 				});
@@ -47,7 +47,7 @@
 	</head>
 	<body>
 		<h1>DM Online: {{ room }}</h1>
-		<textarea id="dm" cols="80" rows="20"></textarea><br><br>
+		<textarea id="dm" cols="80" rows="20" readonly></textarea><br><br>
 		<input id="text" size="80" placeholder="Enter your message here"><br><br>
 		<form id="clap">
 			<input type="submit" value="Clapping Crowd"><br><br>
