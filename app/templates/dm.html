@@ -1,6 +1,12 @@
 <html>
 	<head>
 		<title>DM Online: {{ room }}</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="{{ url_for('static', filename='dm.css') }}">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
 		<script type="text/javascript" charset="utf-8">
@@ -31,7 +37,7 @@
 					}
 				});
 				$('#clap').submit(function(e) {
-					socket.emit('sound', {sound: '/static/crowd.mp3'});
+					socket.emit('sound', {sound: "{{ url_for('static', filename='crowd.mp3') }}"});
 					return false;
 				});
 			});
@@ -46,12 +52,27 @@
 		</script>
 	</head>
 	<body>
-		<h1>DM Online: {{ room }}</h1>
-		<textarea id="dm" cols="80" rows="20"></textarea><br><br>
-		<input id="text" size="80" placeholder="Enter your message here"><br><br>
-		<form id="clap">
-			<input type="submit" value="Clapping Crowd"><br><br>
-		</form>
-		<a href="#" onclick="leave_room();">Leave this room</a>
+		<div class="container-fluid">
+			<div class="row">
+				<h1>DM Online: {{ room }}</h1>
+			</div>
+			<div class="row content">
+				<div class="col-sm-9">
+					<textarea id="dm" class="form-control" rows="20"></textarea><br><br>
+					<input id="text" size="80" placeholder="Enter your message here"><br><br>
+					<form id="clap">
+						<input type="submit" value="Clapping Crowd"><br><br>
+					</form>
+					<a href="#" onclick="leave_room();">Leave this room</a>
+				</div>
+				<div class="col-sm-3">
+					<ul class="list-group">
+						{% for user in session["users"]%}
+						<li class="list-group-item">{{ user }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
