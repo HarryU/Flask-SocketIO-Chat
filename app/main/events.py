@@ -34,3 +34,10 @@ def sound(index):
     room = session.get('room')
     print(index)
     emit('sound', index, room=room)
+
+
+@socketio.on('add_button', namespace='/dm')
+def add_button(button_info):
+    room = session.get('room')
+    print(button_info)
+    emit('new_button', button_info['name'], room=room)

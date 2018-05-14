@@ -1,3 +1,7 @@
 .row .content {
   height: 1500px;
 }
+
+#file_loader {
+  display: none;
+}
