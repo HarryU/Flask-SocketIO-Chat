@@ -28,7 +28,9 @@ def left(message):
     leave_room(room)
     emit('status', {'msg': session.get('name') + ' has left the room.'}, room=room)
 
+
 @socketio.on('sound', namespace='/dm')
-def sound(path):
+def sound(index):
     room = session.get('room')
-    emit('sound', {'sound': path['sound']}, room=room)
+    print(index)
+    emit('sound', index, room=room)
