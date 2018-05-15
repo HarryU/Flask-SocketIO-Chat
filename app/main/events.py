@@ -1,6 +1,7 @@
 from flask import session
 from flask_socketio import emit, join_room, leave_room
 from .. import socketio
+import random
 
 
 @socketio.on('joined', namespace='/dm')
@@ -32,12 +33,17 @@ def left(message):
 @socketio.on('sound', namespace='/dm')
 def sound(index):
     room = session.get('room')
-    print(index)
     emit('sound', index, room=room)
 
 
 @socketio.on('add_button', namespace='/dm')
 def add_button(button_info):
     room = session.get('room')
-    print(button_info)
     emit('new_button', button_info['name'], room=room)
+
+
+@socketio.on('dice_roll', namespace='/dm')
+def dice_roll(sides, number):
+    room = session.get('room')
+    result = [random.randint(1, int(sides)) for _ in range(int(number))]
+    text({'msg': "You rolled {} on {} {} sided dice.".format(result, number, sides)})

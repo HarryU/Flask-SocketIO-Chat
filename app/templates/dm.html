@@ -15,55 +15,61 @@ var socket;
 var audio_clips = {clap: new Audio("{{ url_for('static', filename='clap.mp3') }}"),
   dog: new Audio("{{ url_for('static', filename='dog.mp3') }}")}
 
-$(document).ready(function(){
-  socket = io.connect('//' + document.domain + ':' + location.port + '/dm');
-  socket.on('connect', function() {
-    socket.emit('joined', {});
+  $(document).ready(function(){
+    socket = io.connect('//' + document.domain + ':' + location.port + '/dm');
+    socket.on('connect', function() {
+      socket.emit('joined', {});
+    });
+    socket.on('status', function(data) {
+      $('#dm').val($('#dm').val() + '<' + data.msg + '>\n');
+      $('#dm').scrollTop($('#dm')[0].scrollHeight);
+    });
+    socket.on('message', function(data) {
+      $('#dm').val($('#dm').val() + data.msg + '\n');
+      $('#dm').scrollTop($('#dm')[0].scrollHeight);
+    });
+    socket.on('sound', function(index) {
+      if (audio_clips[index].paused) {
+        audio_clips[index].play();
+      } else {
+        audio_clips[index].pause();
+      }
+    });
+    socket.on('new_button', function(button_name) {
+      var element = document.createElement("button");
+      element.id = button_name;
+      element.type = "submit";
+      element.className = "btn";
+      element.innerHTML = button_name;
+      var button_group = document.getElementById("sound_buttons");
+      button_group.appendChild(element);
+    });
+    $('#text').keypress(function(e) {
+      var code = e.keyCode || e.which;
+      if (code == 13) {
+        text = $('#text').val();
+        $('#text').val('');
+        socket.emit('text', {msg: text});
+      }
+    });
+    $('button.sound').click(function(e) {
+      console.log(this.id);
+      socket.emit('sound', this.id);
+      return false;
+    });
+    $('#add_new').click(function(e) {
+      new_name = $('#new_name').val();
+      $('#new_name').val('');
+      socket.emit('add_button', {name: new_name});
+      return false;
+    });
+    $('#dice').click(function(e) {
+      sides = $('#sides').val();
+      n_dice = $('#n_dice').val();
+      socket.emit('dice_roll', sides, n_dice);
+      return false;
+    });
   });
-  socket.on('status', function(data) {
-    $('#dm').val($('#dm').val() + '<' + data.msg + '>\n');
-    $('#dm').scrollTop($('#dm')[0].scrollHeight);
-  });
-  socket.on('message', function(data) {
-    $('#dm').val($('#dm').val() + data.msg + '\n');
-    $('#dm').scrollTop($('#dm')[0].scrollHeight);
-  });
-  socket.on('sound', function(index) {
-    if (audio_clips[index].paused) {
-      audio_clips[index].play();
-    } else {
-      audio_clips[index].pause();
-    }
-  });
-  socket.on('new_button', function(button_name) {
-    var element = document.createElement("button");
-    element.id = button_name;
-    element.type = "submit";
-    element.className = "btn";
-    element.innerHTML = button_name;
-    var button_group = document.getElementById("sound_buttons");
-    button_group.appendChild(element);
-  });
-  $('#text').keypress(function(e) {
-    var code = e.keyCode || e.which;
-    if (code == 13) {
-      text = $('#text').val();
-      $('#text').val('');
-      socket.emit('text', {msg: text});
-    }
-  });
-  $('button').click(function(e) {
-    console.log(this.id);
-    socket.emit('sound', this.id);
-    return false;
-  });
-  $('#add_new').click(function(e) {
-    new_name = $('#new_name').val();
-    $('#new_name').val('');
-    socket.emit('add_button', {name: new_name});
-    return false;
-  });
-});
 function leave_room() {
   socket.emit('left', {}, function() {
     socket.disconnect();
@@ -85,6 +91,11 @@ function openfileDialog() {
         <div class="col-md-3">
           <textarea id="dm" class="form-control" rows="20" readonly></textarea><br><br>
           <input id="text" class="form-control" placeholder="Enter your message here"><br><br>
+					<label for="n_dice">Number of Dice</label>
+					<input type="number" id="n_dice" value="1" min="1" max="30">
+					<label for="sides">Number of Sides</label>
+					<input type="number" id="sides" value="6" min="1" max="150">
+          <button id="dice">Roll Dice</button>
           <a href="#" onclick="leave_room();">Leave this room</a>
         </div>
         <div class="col-md-6">
@@ -93,11 +104,11 @@ function openfileDialog() {
         <div class="col-md-3">
           <div class="row">
             <div class="btn-group-vertical" id="sound_buttons">
-              <button id="clap" type="submit" class="btn">Clapping Crowd</button>
-              <button id="dog" type="submit" class="btn">Dog Barking</button>
+              <button id="clap" type="submit" class="btn sound">Clapping Crowd</button>
+              <button id="dog" type="submit" class="btn sound">Dog Barking</button>
             </div>
             <form>
-              <input type="submit" id="add_new" value="Add new audio" />
+              <input type="submit" id="add_new sound" value="Add new audio" />
               <input id="new_name" placeholder="Enter a new clip name here" />
             </form>
           </div>
